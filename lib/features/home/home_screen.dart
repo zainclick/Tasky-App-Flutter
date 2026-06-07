@@ -1,15 +1,17 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:tests/core/constants/storage_key.dart';
 import 'package:tests/core/theme/theme_controller.dart';
 import 'package:tests/core/widgets/custom_svg_picture.dart';
 import 'package:tests/models/task_model.dart';
-import 'package:tests/screens/add_task.dart';
+import 'package:tests/features/add_task/add_task.dart';
 import 'package:tests/widgets/archieved_tasks_widget.dart';
 import 'package:tests/widgets/high_priority_tasks_widget.dart';
 import 'package:tests/widgets/sliver_task_list_widget.dart';
 
-import '../core/services/preferences_manager.dart';
+import '../../core/services/preferences_manager.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -25,6 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   int totalTasks = 0;
   int totalDoneTasks = 0;
   double percent = 0;
+  String? userImagePath;
 
   @override
   void initState() {
@@ -35,7 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadUserName() async {
     setState(() {
-      username = PreferencesManagers().getString("username");
+      username = PreferencesManagers().getString(StorageKey.username);
+      userImagePath = PreferencesManagers().getString(StorageKey.userImage);
     });
   }
 
@@ -43,7 +47,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       isLoading = true;
     });
-    final finalTask = PreferencesManagers().getString("tasks");
+    final finalTask = PreferencesManagers().getString(StorageKey.tasks);
     if (finalTask != null) {
       final taskAfterDecode = jsonDecode(finalTask) as List<dynamic>;
       final task = taskAfterDecode.map((element) {
@@ -74,7 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final updatedTask = tasks.map((element) => element.toJson()).toList();
 
-    await PreferencesManagers().setString("tasks", jsonEncode(updatedTask));
+    await PreferencesManagers().setString(StorageKey.tasks, jsonEncode(updatedTask));
   }
 
   void _deleteTask(int? id) async {
@@ -85,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _calculatePercent();
     });
     final updatedTask = tasks.map((element) => element.toJson()).toList();
-    await PreferencesManagers().setString("tasks", jsonEncode(updatedTask));
+    await PreferencesManagers().setString(StorageKey.tasks, jsonEncode(updatedTask));
   }
 
   @override
@@ -125,9 +129,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         CircleAvatar(
-                          backgroundImage: AssetImage(
-                            "assets/images/person.png",
-                          ),
+                          backgroundImage: userImagePath == null
+                              ? AssetImage("assets/images/person.png")
+                              : FileImage(File(userImagePath!)),
                         ),
                         SizedBox(width: 8),
                         Column(

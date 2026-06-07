@@ -3,12 +3,14 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:tests/core/constants/storage_key.dart';
 import 'package:tests/core/theme/theme_controller.dart';
 import 'package:tests/main.dart';
-import 'package:tests/screens/user_details_screen.dart';
-import 'package:tests/screens/welcome_Screen.dart';
+import 'package:tests/features/profile/user_details_screen.dart';
+import 'package:tests/features/welcome/welcome_Screen.dart';
 
-import '../core/services/preferences_manager.dart';
+import '../../core/services/preferences_manager.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -19,9 +21,9 @@ class ProfileScreen extends StatefulWidget {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   String? username = "Default";
+  String? userImagePath;
   String? motivationQuote = "Default";
   bool isDarkMode = true;
-  File? _selectedImage;
 
   @override
   void initState() {
@@ -31,10 +33,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Future<void> _loadUserData() async {
     setState(() {
-      username = PreferencesManagers().getString("username");
+      username = PreferencesManagers().getString(StorageKey.username);
+      userImagePath = PreferencesManagers().getString(StorageKey.userImage);
       isDarkMode = PreferencesManagers().getBool("theme") ?? true;
       motivationQuote =
-          PreferencesManagers().getString("motivation_quote") ??
+          PreferencesManagers().getString(StorageKey.motivationQuote) ??
           "One task at a time. One step closer.";
     });
   }
@@ -56,16 +59,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     alignment: Alignment.bottomRight,
                     children: [
                       CircleAvatar(
-                        backgroundImage: _selectedImage == null
+                        backgroundImage: userImagePath == null
                             ? AssetImage("assets/images/person.png")
-                            : FileImage(_selectedImage!),
+                            : FileImage(File(userImagePath!)),
                         radius: 50,
                       ),
                       GestureDetector(
                         onTap: () async {
                           _showImageSourceDialog(context, (XFile file) {
+                            _saveImage(file);
                             setState(() {
-                              _selectedImage = File(file.path);
+                              userImagePath = file.path;
                             });
                           });
                         },
@@ -158,9 +162,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             Divider(thickness: 1),
             ListTile(
               onTap: () async {
-                PreferencesManagers().remove("username");
-                PreferencesManagers().remove("tasks");
-                PreferencesManagers().remove("motivation_quote");
+                PreferencesManagers().remove(StorageKey.username);
+                PreferencesManagers().remove(StorageKey.tasks);
+                PreferencesManagers().remove(StorageKey.motivationQuote);
 
                 Navigator.pushAndRemoveUntil(
                   context,
@@ -187,6 +191,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
     );
+  }
+
+  void _saveImage(XFile file) async {
+    final appDir = await getApplicationDocumentsDirectory();
+    final newFile = await File(file.path).copy('${appDir.path}/${file.name}');
+    await PreferencesManagers().setString(StorageKey.userImage, newFile.path);
   }
 
   void _showImageSourceDialog(

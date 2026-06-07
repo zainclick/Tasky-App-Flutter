@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:tests/core/constants/storage_key.dart';
 import 'package:tests/core/theme/dark_theme.dart';
 import 'package:tests/core/theme/light_theme.dart';
 import 'package:tests/core/theme/theme_controller.dart';
-import 'package:tests/screens/main_screen.dart';
-import 'package:tests/screens/welcome_Screen.dart';
+import 'package:tests/features/navigation/main_screen.dart';
+import 'package:tests/features/welcome/welcome_Screen.dart';
 
 import 'core/services/preferences_manager.dart';
 
@@ -11,7 +12,7 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await PreferencesManagers().init();
   ThemeController.init();
-  final userName = PreferencesManagers().getString("username");
+  final userName = PreferencesManagers().getString(StorageKey.username);
   return runApp(MyApp(username: userName));
 }
 
