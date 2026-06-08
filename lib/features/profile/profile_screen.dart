@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {
       username = PreferencesManagers().getString(StorageKey.username);
       userImagePath = PreferencesManagers().getString(StorageKey.userImage);
-      isDarkMode = PreferencesManagers().getBool("theme") ?? true;
+      isDarkMode = PreferencesManagers().getBool(StorageKey.theme) ?? true;
       motivationQuote =
           PreferencesManagers().getString(StorageKey.motivationQuote) ??
           "One task at a time. One step closer.";

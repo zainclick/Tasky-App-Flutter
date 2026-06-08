@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:tests/screens/completed_tasks_screen.dart';
+import 'package:tests/features/tasks/completed_tasks_screen.dart';
 import 'package:tests/features/home/home_screen.dart';
 import 'package:tests/features/profile/profile_screen.dart';
 import 'package:tests/features/tasks/tasks_screen.dart';

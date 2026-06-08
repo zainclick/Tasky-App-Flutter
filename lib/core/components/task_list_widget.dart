@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tests/core/widgets/custom_check_box.dart';
 import 'package:tests/models/task_model.dart';
-import 'package:tests/widgets/task_item_widget.dart';
+import 'package:tests/core/components/task_item_widget.dart';
 
 class TaskListWidget extends StatelessWidget {
   TaskListWidget({
@@ -13,11 +13,14 @@ class TaskListWidget extends StatelessWidget {
     required this.onTap,
     this.emptyMesseage,
     required this.onDelete,
+    required this.onEdit,
   });
 
   final List<TaskModel> tasks;
   final Function(bool?, int?) onTap;
   final Function(int?) onDelete;
+  final Function onEdit;
+
   final String? emptyMesseage;
 
   @override
@@ -42,6 +45,9 @@ class TaskListWidget extends StatelessWidget {
                   },
                   onDelete: (int? id) {
                     onDelete(id);
+                  },
+                  onEdit: () {
+                    onEdit();
                   },
                 ),
               );
